@@ -16,3 +16,14 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
+
+    analyses = db.relationship("Analysis", backref="user", lazy=True)
+
+class Analysis(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    url = db.Column(db.String(255), nullable=False)
+    score = db.Column(db.Integer)
+    missing = db.Column(db.JSON)
+    suggestions = db.Column(db.JSON)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

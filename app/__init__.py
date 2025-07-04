@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from .extensions import db, jwt, migrate, limiter
 from .routes.auth import auth_bp
+from .routes.analysis import analysis_bp
 
 def create_app():
     from .config import Config
@@ -17,4 +18,5 @@ def create_app():
     limiter.init_app(app)
 
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    app.register_blueprint(analysis_bp, url_prefix="/api")
     return app
