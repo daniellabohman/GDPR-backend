@@ -13,7 +13,7 @@ EMAIL_REGEX = r"[^@]+@[^@]+\.[^@]+"
 def is_valid_email(email):
     return re.match(EMAIL_REGEX, email)
 
-# ✅ REGISTRERING
+# REGISTRERING
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
@@ -42,7 +42,7 @@ def register():
 
     return jsonify({"msg": "User registered successfully"}), 201
 
-# ✅ LOGIN – access token + refresh token (httpOnly-cookie)
+# LOGIN – access token + refresh token (httpOnly-cookie)
 @auth_bp.route("/login", methods=["POST"])
 @limiter.limit("5 per minute")
 def login():
@@ -70,7 +70,7 @@ def login():
     )
     return response
 
-# ✅ REFRESH (henter ny access token)
+# REFRESH (henter ny access token)
 @auth_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh():
@@ -86,26 +86,15 @@ def refresh():
     )
     return jsonify(access_token=new_access_token), 200
 
-# ✅ LOGOUT – sletter refresh cookie
+# LOGOUT – sletter refresh cookie
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
     response = jsonify({"msg": "Logged out"})
     response.set_cookie("refresh_token", "", max_age=0)
     return response
 
-# ✅ BESKYTTET /me ENDPOINT
-@auth_bp.route("/me", methods=["GET"])
-@jwt_required()
-def get_me():
-    identity = get_jwt_identity()
-    claims = get_jwt()
-    return jsonify({
-        "email": identity,
-        "role": claims.get("role"),
-        "company": claims.get("company")
-    })
 
-# ✅ KUN ADMIN
+# KUN ADMIN
 @auth_bp.route("/admin/only", methods=["GET"])
 @jwt_required()
 def admin_route():
@@ -117,3 +106,39 @@ def admin_route():
         "msg": f"Welcome, admin from {claims.get('company')}",
         "email": identity
     }), 200
+
+# Hent brugerens profil (GET)
+@auth_bp.route("/me", methods=["GET"])
+@jwt_required()
+def get_profile():
+    user_email = get_jwt_identity()
+    user = User.query.filter_by(email=user_email).first()
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    return jsonify({
+        "company_name": user.company_name,
+        "email": user.email,
+        "website_url": user.website_url,
+        "cvr": user.cvr,
+        "contact_email": user.contact_email
+    }), 200
+
+
+# Opdater brugerens profil (PUT)
+@auth_bp.route("/me", methods=["PUT"])
+@jwt_required()
+def update_profile():
+    user_email = get_jwt_identity()
+    user = User.query.filter_by(email=user_email).first()
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    data = request.get_json()
+    user.company_name = data.get("company_name", user.company_name)
+    user.website_url = data.get("website_url", user.website_url)
+    user.cvr = data.get("cvr", user.cvr)
+    user.contact_email = data.get("contact_email", user.contact_email)
+
+    db.session.commit()
+    return jsonify({"msg": "Profil opdateret"}), 200

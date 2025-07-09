@@ -10,6 +10,8 @@ class User(db.Model):
     website_url = db.Column(db.String(255))
     role = db.Column(db.String(50), default="user")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    cvr = db.Column(db.String(50))
+    contact_email = db.Column(db.String(255))
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -18,6 +20,7 @@ class User(db.Model):
         return check_password_hash(self.password, password)
 
     analyses = db.relationship("Analysis", backref="user", lazy=True)
+    privacy_policies = db.relationship("PrivacyPolicy", backref="user", lazy=True)
 
 class Analysis(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,4 +29,11 @@ class Analysis(db.Model):
     score = db.Column(db.Integer)
     missing = db.Column(db.JSON)
     suggestions = db.Column(db.JSON)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class PrivacyPolicy(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    data = db.Column(db.JSON, nullable=False)  # form-input fra bruger
+    html_output = db.Column(db.Text, nullable=False)  # HTML-genereret resultat
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
