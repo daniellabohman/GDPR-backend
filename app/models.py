@@ -37,3 +37,15 @@ class PrivacyPolicy(db.Model):
     data = db.Column(db.JSON, nullable=False)  # form-input fra bruger
     html_output = db.Column(db.Text, nullable=False)  # HTML-genereret resultat
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class BlogPost(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    slug = db.Column(db.String(255), unique=True, nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    published = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    author = db.relationship("User", backref="blog_posts")

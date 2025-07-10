@@ -4,6 +4,8 @@ from .extensions import db, jwt, migrate, limiter
 from .routes.auth import auth_bp
 from .routes.analysis import analysis_bp
 from .routes.policy import policy_bp
+from .routes.sitemap import sitemap_bp
+from .routes.blog import blog_bp
 
 def create_app():
     from .config import Config
@@ -26,5 +28,7 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(analysis_bp, url_prefix="/api")
     app.register_blueprint(policy_bp, url_prefix="/api/gdpr")
+    app.register_blueprint(sitemap_bp)
+    app.register_blueprint(blog_bp, url_prefix="/api/blog")
 
     return app

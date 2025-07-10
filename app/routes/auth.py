@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify, make_response, abort
 from flask_jwt_extended import (
     create_access_token, create_refresh_token,
     jwt_required, get_jwt_identity, get_jwt
@@ -142,3 +142,4 @@ def update_profile():
 
     db.session.commit()
     return jsonify({"msg": "Profil opdateret"}), 200
+
