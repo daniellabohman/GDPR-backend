@@ -24,7 +24,7 @@ class User(db.Model):
 
 class Analysis(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
     url = db.Column(db.String(255), nullable=False)
     score = db.Column(db.Integer)
     missing = db.Column(db.JSON)
