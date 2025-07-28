@@ -49,3 +49,11 @@ class BlogPost(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     author = db.relationship("User", backref="blog_posts")
+
+
+class PolicyLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+    input_data = db.Column(db.JSON, nullable=False)
+    output_html = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

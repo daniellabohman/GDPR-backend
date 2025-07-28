@@ -3,10 +3,9 @@ from flask_jwt_extended import jwt_required
 from app.models import BlogPost, db
 from utils.permissions import require_admin_user
 
-
 blog_bp = Blueprint("blog", __name__)
 
-
+# 🔒 Kun admin
 @blog_bp.post("/")
 @jwt_required()
 def create_blog():
@@ -23,6 +22,7 @@ def create_blog():
     db.session.commit()
     return jsonify({"message": "Blogindlæg oprettet", "id": post.id}), 201
 
+# 🌐 Offentlig
 @blog_bp.get("/")
 def list_blogs():
     posts = BlogPost.query.filter_by(published=True).order_by(BlogPost.created_at.desc()).all()
@@ -36,6 +36,7 @@ def list_blogs():
         for p in posts
     ])
 
+# 🌐 Offentlig
 @blog_bp.get("/<slug>")
 def get_blog(slug):
     post = BlogPost.query.filter_by(slug=slug, published=True).first_or_404()
@@ -47,6 +48,7 @@ def get_blog(slug):
         "author": post.author.email
     })
 
+# 🔒 Kun admin
 @blog_bp.put("/<int:id>")
 @jwt_required()
 def update_blog(id):
@@ -62,6 +64,7 @@ def update_blog(id):
     db.session.commit()
     return jsonify({"message": "Blogindlæg opdateret"}), 200
 
+# 🔒 Kun admin
 @blog_bp.delete("/<int:id>")
 @jwt_required()
 def delete_blog(id):

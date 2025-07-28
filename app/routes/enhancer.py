@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from utils.text_analysis import analyze_policy_text  
 
-enhancer_bp = Blueprint("enhancer")
+enhancer_bp = Blueprint("enhancer", __name__)
 
 @enhancer_bp.post("/analyze-text")
 @jwt_required()

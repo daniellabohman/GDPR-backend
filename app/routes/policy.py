@@ -1,7 +1,7 @@
 # Blueprint: /api/gdpr
 from flask import Blueprint, request, jsonify, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import User, PrivacyPolicy
+from app.models import User, PrivacyPolicy, PolicyLog
 from app.extensions import db
 from datetime import datetime
 from weasyprint import HTML
@@ -44,7 +44,17 @@ def generate_policy():
         html_output=html,
         created_at=datetime.utcnow()
     )
+
     db.session.add(policy)
+    db.session.commit()
+
+    log = PolicyLog(
+        user_id=user.id,
+        input_data=data,
+        output_html=html
+    )
+
+    db.session.add(log)
     db.session.commit()
 
     return jsonify({ "html": html, "id": policy.id }), 200
